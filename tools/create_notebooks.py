@@ -74,7 +74,7 @@ def create_ipynb_files(dataset_ids_dict, output_dir="notebooks"):
                     "source": [
                         "import openml\n\n",
                         f"dataset = openml.datasets.get_dataset({dataset_id})\n",
-                        "X, y, _, _ = dataset.get_data(target=dataset.default_target_attribute, dataset_format='dataframe')",
+                        "X, y, cat_atr_mask, names = dataset.get_data(target=dataset.default_target_attribute, dataset_format='dataframe')",
                     ],
                 },
                 {
