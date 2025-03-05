@@ -20,6 +20,7 @@ shap>=0.40.0
 eli5>=0.11.0
 imbalanced-learn>=0.9.0
 mlflow>=1.26.0
+MissForest==4.2.3
 neptune-client>=0.16.0
 ucimlrepo>=0.0.7
 kagglehub>=0.1.0
