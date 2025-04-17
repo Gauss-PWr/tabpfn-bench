@@ -21,7 +21,7 @@ class DateToNumericTransformer(BaseEstimator, TransformerMixin):
         return self.fit(X).transform(X)
 
 
-class DataProcessor(BaseEstimator, TransformerMixin):
+class DataPreprocessor(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         cat_features=[],
