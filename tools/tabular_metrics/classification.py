@@ -12,7 +12,7 @@ from sklearn.metrics import (
 
 """
 ===============================
-Classification calculation
+Classification
 ===============================
 """
 
