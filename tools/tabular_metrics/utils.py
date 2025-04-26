@@ -5,6 +5,7 @@ Metrics calculation
 Includes a few metric as well as functions composing metrics on results files.
 
 """
+
 from __future__ import annotations
 
 from typing import Any, Callable, Literal, TypedDict
@@ -450,7 +451,7 @@ def check_metric_fits_task_type(metric_used, task_type):
 
 
 def get_standard_eval_baselines(
-    task_type: Literal["multiclass", "regression", "survival"]
+    task_type: Literal["multiclass", "regression", "survival"],
 ) -> list[str]:
     if task_type == "multiclass":
         return [
@@ -503,7 +504,7 @@ def get_standard_eval_baselines(
 
 
 def get_standard_eval_metrics(
-    task_type: Literal["multiclass", "regression", "survival", "quantile_regression"]
+    task_type: Literal["multiclass", "regression", "survival", "quantile_regression"],
 ) -> list[MetricDefinition]:
     generic_metrics = [
         {"func": time_metric, "aggregator": "sum"},
