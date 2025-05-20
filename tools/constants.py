@@ -1,5 +1,5 @@
 from hyperopt import hp
-
+import numpy as np
 
 xgb_params = {
     "learning_rate": hp.loguniform("learning_rate", np.log(1e-7), np.log(1)),
@@ -36,4 +36,14 @@ catboost_params = {
     "leaf_estimation_iterations": hp.quniform("leaf_estimation_iterations", 1, 20, 1),
     "iterations": hp.quniform("iterations", 100, 4000, 1),
 }
-tabpfn_params = {}
+tabpfn_params = {
+    'n_estimators': hp.choice('n_estimators', [4, 8, 16, 32]),
+    'softmax_temperature': hp.uniform('softmax_temperature', 0.75, 1.0),
+    'average_before_softmax': hp.choice('average_before_softmax', [False, True]),
+    'fit_mode': hp.choice('fit_mode', ["low_memory", "fit_preprocessors", "fit_with_cache"]),
+    'memory_saving_mode': hp.choice('memory_saving_mode', [True, False, "auto"]),
+    'random_state': hp.randint('random_state', 0, 100),
+    'n_jobs': hp.choice('n_jobs', [1, 4, -1]),
+}
+
+# w paperze jakies jeszcze gowno pisali trza zobaczyc
