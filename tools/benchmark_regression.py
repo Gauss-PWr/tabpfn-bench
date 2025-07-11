@@ -1,11 +1,11 @@
-from xgboost import XGBRegressor
-from lightgbm import LGBMRegressor
-from catboost import CatBoostRegressor
-from tabpfn import TabPFNRegressor
-from tabular_metrics import get_regression_metrics 
-from hyperparameter_tuning import get_model_params 
-import torch
 import pandas as pd
+import torch
+from catboost import CatBoostRegressor
+from hyperparameter_tuning import get_model_params
+from lightgbm import LGBMRegressor
+from tabpfn import TabPFNRegressor
+from tabular_metrics import get_regression_metrics
+from xgboost import XGBRegressor
 
 
 def match_model(model):
@@ -28,13 +28,13 @@ def benchmark_dataset_regression(
     X_test,
     y_test,
     models=[
-        'XGBRegressor',
-        'LGBMRegressor',
-        'CatBoostRegressor',
-        'TabPFNRegressor',
+        "XGBRegressor",
+        "LGBMRegressor",
+        "CatBoostRegressor",
+        "TabPFNRegressor",
     ],
     csv_path=None,
-):  
+):
     if type(X_train) == pd.DataFrame:
         X_train = X_train.to_numpy()
     if type(X_test) == pd.DataFrame:
@@ -43,11 +43,10 @@ def benchmark_dataset_regression(
         y_train = y_train.to_numpy()
     if type(y_test) == pd.Series:
         y_test = y_test.to_numpy()
-    
-    
+
     results = {}
     for model in models:
-        if model == 'TabPFNRegressor':
+        if model == "TabPFNRegressor":
             X_train = torch.Tensor(X_train)
             X_test = torch.Tensor(X_test)
             y_train = torch.Tensor(y_train)
@@ -63,28 +62,28 @@ def benchmark_dataset_regression(
 
         metrics = get_regression_metrics(X_test, y_test, model_default)
 
-        results[model.__class__.__name__+'_default'] = metrics
-        
+        results[model.__class__.__name__ + "_default"] = metrics
+
         params = get_model_params(
             model_default,
             X_train,
             y_train,
             tune=True,
             tune_metric="r2",
-            max_time=4*60*60, # 4h
-            use_tensor=model == 'TabPFNRegressor',
+            max_time=4 * 60 * 60,  # 4h
+            use_tensor=model == "TabPFNRegressor",
         )
         model_tuned = match_model(model)(**params)
-        
+
         model_tuned.fit(X_train, y_train)
         metrics = get_regression_metrics(X_test, y_test, model_tuned)
-        
-        results[model.__class__.__name__+'_tuned'] = metrics
-        
+
+        results[model.__class__.__name__ + "_tuned"] = metrics
+
     if csv_path:
         import pandas as pd
-        
+
         df = pd.DataFrame(results)
         df.to_csv(csv_path, index=False)
-        
+
     return results

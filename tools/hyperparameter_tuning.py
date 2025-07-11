@@ -1,18 +1,21 @@
-import tqdm
-import numpy as np
-from hyperopt import fmin, tpe, STATUS_OK, Trials, space_eval
 import time
-from sklearn.model_selection import train_test_split
-import torch
+
+import numpy as np
 import pandas as pd
+import torch
+import tqdm
+from hyperopt import STATUS_OK, Trials, fmin, space_eval, tpe
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from tools.constants import xgb_params, lgbm_params, catboost_params, tabpfn_params
+from sklearn.model_selection import train_test_split
+
 import tools.tabular_metrics as tabular_metrics
+from tools.constants import (catboost_params, lgbm_params, tabpfn_params,
+                             xgb_params)
 
 
 def get_scoring_direction(metric):
     # not implemented yet 1 for maximization, -1 for minimization
-    return 1  
+    return 1
 
 
 def match_model_params(model):
@@ -48,8 +51,7 @@ def get_model_params(
     use_tensor=False,
     device=None,
 ):
-    
-    
+
     if type(X_train) == torch.Tensor:
         X_train = X_train.cpu().numpy()
 
@@ -57,13 +59,13 @@ def get_model_params(
         X_train = X_train.to_numpy()
 
     if type(y_train) == torch.Tensor:
-        if 'Classifier' in model.__class__.__name__:
+        if "Classifier" in model.__class__.__name__:
             y_train = y_train.cpu().long().numpy()
         else:
             y_train = y_train.cpu().float().numpy()
 
     elif type(y_train) == pd.Series:
-        if 'Classifier' in model.__class__.__name__:
+        if "Classifier" in model.__class__.__name__:
             y_train = y_train.to_numpy().astype(np.int64)
         else:
             y_train = y_train.to_numpy().astype(np.float32)
@@ -71,7 +73,6 @@ def get_model_params(
     if not tune:
         return {}
     params = match_model_params(model)
-
 
     X_train_subset, X_val, y_train_subset, y_val = train_test_split(
         X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
@@ -81,13 +82,12 @@ def get_model_params(
             torch.tensor(X_train_subset),
             torch.tensor(y_train_subset),
         )
-        
-          
+
         X_val, y_val = torch.tensor(X_val), torch.tensor(y_val)
         X_train_subset, y_train_subset = X_train_subset.float(), y_train_subset.long()
         X_val, y_val = X_val.float(), y_val.long()
-        
-        if 'Classifier' in model.__class__.__name__:
+
+        if "Classifier" in model.__class__.__name__:
             y_train_subset = y_train_subset.int()
             y_val = y_val.int()
 
@@ -100,7 +100,7 @@ def get_model_params(
     def objective(params):
         for key, value in params.items():
             setattr(model, key, value)
-            
+
         model.fit(X_train_subset, y_train_subset)
         if hasattr(model, "predict_proba"):
             y_pred = model.predict_proba(X_val)
@@ -108,7 +108,7 @@ def get_model_params(
                 y_pred = y_pred[:, 1]
         else:
             y_pred = model.predict(X_val)
-        #metric_func = getattr(tabular_metrics, f"get_{tune_metric}")
+        # metric_func = getattr(tabular_metrics, f"get_{tune_metric}")
         metric_func = accuracy_score
         try:
             score = metric_func(y_val, y_pred)

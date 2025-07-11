@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import torch
-from sklearn.metrics import (
-    mean_absolute_error,
-    r2_score,
-)
+from sklearn.metrics import mean_absolute_error, r2_score
 
 """
 ===============================

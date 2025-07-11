@@ -2,13 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 import torch
-from sklearn.metrics import (
-    roc_auc_score,
-    accuracy_score,
-    balanced_accuracy_score,
-    average_precision_score,
-    f1_score,
-)
+from sklearn.metrics import (accuracy_score, average_precision_score,
+                             balanced_accuracy_score, f1_score, roc_auc_score)
 
 """
 ===============================

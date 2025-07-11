@@ -1,10 +1,10 @@
-from xgboost import XGBClassifier
-from lightgbm import LGBMClassifier
-from catboost import CatBoostClassifier
-from tabpfn import TabPFNClassifier
-from tabular_metrics import get_classification_metrics 
-from hyperparameter_tuning import get_model_params 
 import torch
+from catboost import CatBoostClassifier
+from hyperparameter_tuning import get_model_params
+from lightgbm import LGBMClassifier
+from tabpfn import TabPFNClassifier
+from tabular_metrics import get_classification_metrics
+from xgboost import XGBClassifier
 
 
 def match_model(model):
@@ -27,13 +27,13 @@ def benchmark_dataset_classification(
     X_test,
     y_test,
     models=[
-        'XGBClassifier',
-        'LGBMClassifier',
-        'CatBoostClassifier',
-        'TabPFNClassifier',
+        "XGBClassifier",
+        "LGBMClassifier",
+        "CatBoostClassifier",
+        "TabPFNClassifier",
     ],
     csv_path=None,
-):  
+):
     if type(X_train) == pd.DataFrame:
         X_train = X_train.to_numpy()
     if type(X_test) == pd.DataFrame:
@@ -42,11 +42,10 @@ def benchmark_dataset_classification(
         y_train = y_train.to_numpy()
     if type(y_test) == pd.Series:
         y_test = y_test.to_numpy()
-    
-    
+
     results = {}
     for model in models:
-        if model == 'TabPFNClassifier':
+        if model == "TabPFNClassifier":
             X_train = torch.Tensor(X_train)
             X_test = torch.Tensor(X_test)
             y_train = torch.Tensor(y_train)
@@ -63,28 +62,28 @@ def benchmark_dataset_classification(
         y_pred = model_default.predict(X_test)
         metrics = get_classification_metrics(X_test, y_test, model_default)
 
-        results[model.__class__.__name__+'_default'] = metrics
-        
+        results[model.__class__.__name__ + "_default"] = metrics
+
         params = get_model_params(
             model_default,
             X_train,
             y_train,
             tune=True,
             tune_metric="f1",
-            max_time=4*60*60, # 4h
-            use_tensor=model == 'TabPFNClassifier',
+            max_time=4 * 60 * 60,  # 4h
+            use_tensor=model == "TabPFNClassifier",
         )
         model_tuned = match_model(model)(**params)
-        
+
         model_tuned.fit(X_train, y_train)
         metrics = get_classification_metrics(X_test, y_test, model_tuned)
 
-        results[model.__class__.__name__+'_tuned'] = metrics
-        
+        results[model.__class__.__name__ + "_tuned"] = metrics
+
     if csv_path:
         import pandas as pd
-        
+
         df = pd.DataFrame(results)
         df.to_csv(csv_path, index=False)
-        
+
     return results
