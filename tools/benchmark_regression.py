@@ -84,6 +84,6 @@ def benchmark_dataset_regression(
         import pandas as pd
 
         df = pd.DataFrame(results)
-        df.to_csv(csv_path, index=False)
+        df.to_csv(csv_path, index=False, mode='a')
 
     return results
