@@ -1,5 +1,5 @@
 from xgboost import XGBRegressor
-from lgbm import LGBMRegressor
+from lightgbm import LGBMRegressor
 from catboost import CatBoostRegressor
 from tabpfn import TabPFNRegressor
 from tabular_metrics import get_regression_metrics 
@@ -45,7 +45,6 @@ def benchmark_dataset_regression(
         y_test = y_test.to_numpy()
     
     
-    regression_metrics = get_regression_metrics()
     results = {}
     for model in models:
         if model == 'TabPFNRegressor':
@@ -62,8 +61,7 @@ def benchmark_dataset_regression(
         model_default = match_model(model)()
         model_default.fit(X_train, y_train)
 
-        y_pred = model_default.predict(X_test)
-        metrics = regression_metrics(y_test, y_pred)
+        metrics = get_regression_metrics(X_test, y_test, model_default)
 
         results[model.__class__.__name__+'_default'] = metrics
         
@@ -79,8 +77,7 @@ def benchmark_dataset_regression(
         model_tuned = match_model(model)(**params)
         
         model_tuned.fit(X_train, y_train)
-        y_pred = model_tuned.predict(X_test)
-        metrics = regression_metrics(y_test, y_pred)
+        metrics = get_regression_metrics(X_test, y_test, model_tuned)
         
         results[model.__class__.__name__+'_tuned'] = metrics
         

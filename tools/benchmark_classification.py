@@ -1,5 +1,5 @@
 from xgboost import XGBClassifier
-from lgbm import LGBMClassifier
+from lightgbm import LGBMClassifier
 from catboost import CatBoostClassifier
 from tabpfn import TabPFNClassifier
 from tabular_metrics import get_classification_metrics 
@@ -44,7 +44,6 @@ def benchmark_dataset_classification(
         y_test = y_test.to_numpy()
     
     
-    classification_metrics = get_classification_metrics()
     results = {}
     for model in models:
         if model == 'TabPFNClassifier':
@@ -62,7 +61,7 @@ def benchmark_dataset_classification(
         model_default.fit(X_train, y_train)
 
         y_pred = model_default.predict(X_test)
-        metrics = classification_metrics(y_test, y_pred)
+        metrics = get_classification_metrics(X_test, y_test, model_default)
 
         results[model.__class__.__name__+'_default'] = metrics
         
@@ -78,9 +77,8 @@ def benchmark_dataset_classification(
         model_tuned = match_model(model)(**params)
         
         model_tuned.fit(X_train, y_train)
-        y_pred = model_tuned.predict(X_test)
-        metrics = regression_metrics(y_test, y_pred)
-        
+        metrics = get_classification_metrics(X_test, y_test, model_tuned)
+
         results[model.__class__.__name__+'_tuned'] = metrics
         
     if csv_path:
