@@ -72,7 +72,7 @@ def benchmark_dataset_classification(
             tune=True,
             tune_metric="f1",
             max_time=4*60*60, # 4h
-            use_tensor=False,
+            use_tensor=model == 'TabPFNClassifier',
         )
         model_tuned = match_model(model)(**params)
         

@@ -72,7 +72,7 @@ def benchmark_dataset_regression(
             tune=True,
             tune_metric="r2",
             max_time=4*60*60, # 4h
-            use_tensor=False,
+            use_tensor=model == 'TabPFNRegressor',
         )
         model_tuned = match_model(model)(**params)
         
