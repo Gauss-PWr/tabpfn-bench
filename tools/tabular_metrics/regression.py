@@ -76,6 +76,10 @@ def r2_metric(target, pred):
     return torch.tensor(r2_score(target.float(), pred.float()))
 
 
+def adj_r2(target, pred, num_params):
+    return 1 - (1 - r2_metric(target, pred))*(len(target) - 1)/(len(target) - num_params - 1)
+    
+
 def spearman_metric(target, pred):
     import scipy
 
