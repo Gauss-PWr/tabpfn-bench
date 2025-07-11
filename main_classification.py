@@ -55,3 +55,6 @@ def main():
     # Print results
     for i, result in enumerate(results):
         print(f"Results for dataset {i + 1}: {result}")
+
+if __name__ == "__main__":
+    main()
