@@ -1,3 +1,5 @@
+import os
+
 from sklearn.model_selection import train_test_split
 
 from tools.benchmark_regression import benchmark_dataset_regression
@@ -6,7 +8,7 @@ from tools.preprocess import preprocess_data
 
 
 def main():
-    csv_path = "regression_results.csv"
+    csv_path = os.path.join("results", "regression_results.csv")
     print("Loading datasets...")
 
     ids = get_openml_ids_reg()

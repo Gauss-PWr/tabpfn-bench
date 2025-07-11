@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 
 def preprocess_data(
@@ -15,13 +15,6 @@ def preprocess_data(
     standardize=True,
     categorical_features=[],
 ):
-
-    X_train, y_train, X_test, y_test = (
-        X_train.cpu().numpy(),
-        y_train.cpu().long().numpy(),
-        X_test.cpu().numpy(),
-        y_test.cpu().long().numpy(),
-    )
 
     if impute:
         imputer = SimpleImputer(missing_values=np.nan, strategy="mean")

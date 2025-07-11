@@ -69,7 +69,7 @@ def benchmark_dataset_regression(
             X_train,
             y_train,
             tune=True,
-            tune_metric="r2",
+            tune_metric="mse",
             max_time=4 * 60 * 60,  # 4h
             use_tensor=model == "TabPFNRegressor",
         )

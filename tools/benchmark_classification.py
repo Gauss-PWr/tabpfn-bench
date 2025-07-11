@@ -69,7 +69,7 @@ def benchmark_dataset_classification(
             X_train,
             y_train,
             tune=True,
-            tune_metric="f1",
+            tune_metric="logloss",
             max_time=4 * 60 * 60,  # 4h
             use_tensor=model == "TabPFNClassifier",
         )
