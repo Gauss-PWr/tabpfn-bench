@@ -3,7 +3,9 @@ from __future__ import annotations
 import numpy as np
 import torch
 from sklearn.metrics import (accuracy_score, average_precision_score,
-                             balanced_accuracy_score, f1_score, roc_auc_score)
+                            balanced_accuracy_score, f1_score, roc_auc_score, 
+                            matthews_corrcoef, recall_score, multilabel_confusion_matrix)
+from imlearn.metrics import specifity_score
 
 """
 ===============================
@@ -105,6 +107,10 @@ def auc_metric(target, pred, multi_class="ovr", numpy=False, should_raise=False)
     if not numpy:
         return torch.tensor(score)
     return score
+ 
+
+def informedness_metric(target, pred):
+    pass
 
 
 def accuracy_metric(target, pred):
@@ -145,6 +151,54 @@ def balanced_accuracy_metric(target, pred):
         return torch.tensor(balanced_accuracy_score(target, pred[:, 1] > 0.5))
 
 
+def recall(target, pred, multi_class="micro"):
+    target = torch.tensor(target) if not torch.is_tensor(target) else target
+    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
+    if len(torch.unique(target)) > 2:
+        return torch.tensor(
+            recall_score(target, torch.argmax(pred, -1), average=multi_class) 
+        )
+    else:
+        return torch.tensor(recall_score(target, pred[:, 1] > 0.5))
+
+
+def specifity(target, pred, multi_class="micro"):
+    target = torch.tensor(target) if not torch.is_tensor(target) else target
+    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
+    if len(torch.unique(target)) > 2:
+        return torch.tensor(
+            specifity_score(target, torch.argmax(pred, -1), average=multi_class) 
+        )
+    else:
+        return torch.tensor(recall_score(target, pred[:, 1] > 0.5))
+
+def informedness(target, pred):
+    target = torch.tensor(target) if not torch.is_tensor(target) else target
+    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
+    #TODO: wagowanie 
+    mc_matrix = multilabel_confusion_matrix(target, pred)
+    recall = mc_matrix[:, 0, 0]/(np.sum(mc_matrix[:, 0], axis=1))
+    specifity = mc_matrix[:, 1, 0]/(np.sum(mc_matrix[:, 0], axis=1))
+    return torch.tensor(np.mean(recall + specifity) - 1)
+
+
+def markedness(target, pred):
+    target = torch.tensor(target) if not torch.is_tensor(target) else target
+    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
+    #TODO: wagowanie 
+    mc_matrix = multilabel_confusion_matrix(target, pred)
+    precision = mc_matrix[:, 0, 0]/(np.sum(mc_matrix[:, :, 0], axis=1))
+    npv = mc_matrix[:, 1, 0]/(np.sum(mc_matrix[:, :, 1], axis=1))
+    return torch.tensor(np.mean(precision + npv) - 1)
+
+
+def matthews(target,pred):
+    target = torch.tensor(target) if not torch.is_tensor(target) else target
+    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
+    return torch.tensor(matthews_corrcoef(target, pred))
+
+
+# bratku, nazywanie zmiennych po nazwie paczek moze popsuc kod jesli nie uzywasz aliasu
 def cross_entropy(target, pred, numpy=False):
     target = torch.tensor(target) if not torch.is_tensor(target) else target
     pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
@@ -200,7 +254,6 @@ def is_imbalanced(y, threshold=0.8):
     - y (numpy.ndarray): A 1D numpy array containing class labels.
     - threshold (float): Proportion of the maximum Gini impurity to consider as the boundary
                          between balanced and imbalanced. Defaults to 0.8.
-
     Returns:
     - bool: True if the dataset is imbalanced, False otherwise.
 
