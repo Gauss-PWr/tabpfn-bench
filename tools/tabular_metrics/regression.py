@@ -1,89 +1,33 @@
-from __future__ import annotations
+from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
+import numpy as np
 
-import torch
-from sklearn.metrics import mean_absolute_error, r2_score
+class RegressionBenchmark:
+    def __init__(self, X, y, model):
+        self.target = np.array(y) if not isinstance(y, np.ndarray) else y
+        self.pred = np.array(model.predict(X)) if not isinstance(model.predict(X), np.ndarray) else model.predict(X)
 
-"""
-===============================
-Regression
-===============================
-"""
+        self.dim = X.shape[1] if hasattr(X, 'shape') else 1
+        self.n = X.shape[0] if hasattr(X, 'shape') else len(X)
+        self.model_name = model.__class__.__name__
+        
+    def mae(self, normalized=False):
+        if normalized:
+            return mean_absolute_error(self.target, self.pred) / np.mean(self.target)
+        return mean_absolute_error(self.target, self.pred)
 
+    def nmae(self):
+        return self.mae(normalized=True)
 
-def root_mean_squared_error_metric(target, pred, normalize=False):
-    target = torch.tensor(target) if not torch.is_tensor(target) else target
-    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
-
-    target_ = (
-        target
-        if not normalize
-        else (target - target.min()) / (target.max() - target.min())
-    )
-    pred = (
-        pred if not normalize else (pred - target.min()) / (target.max() - target.min())
-    )
-
-    return torch.sqrt(torch.nn.functional.mse_loss(target_, pred))
-
-
-def normalized_root_mean_squared_error_metric(target, pred):
-    return root_mean_squared_error_metric(target, pred, normalize=True)
-
-
-def mean_squared_error_metric(target, pred, normalize=False):
-    target = torch.tensor(target) if not torch.is_tensor(target) else target
-    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
-
-    target_ = (
-        target
-        if not normalize
-        else (target - target.min()) / (target.max() - target.min())
-    )
-    pred = (
-        pred if not normalize else (pred - target.min()) / (target.max() - target.min())
-    )
-
-    return torch.nn.functional.mse_loss(target_, pred)
-
-
-def normalized_mean_squared_error_metric(target, pred):
-    return mean_squared_error_metric(target, pred, normalize=True)
-
-
-def mean_absolute_error_metric(target, pred, normalize=False):
-    target = torch.tensor(target) if not torch.is_tensor(target) else target
-    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
-
-    target_ = (
-        target
-        if not normalize
-        else (target - target.min()) / (target.max() - target.min())
-    )
-    pred = (
-        pred if not normalize else (pred - target.min()) / (target.max() - target.min())
-    )
-
-    return torch.tensor(mean_absolute_error(target_, pred))
-
-
-def normalized_mean_absolute_error_metric(target, pred):
-    return mean_absolute_error_metric(target, pred, normalize=True)
-
-
-def r2_metric(target, pred):
-    target = torch.tensor(target) if not torch.is_tensor(target) else target
-    pred = torch.tensor(pred) if not torch.is_tensor(pred) else pred
-    return torch.tensor(r2_score(target.float(), pred.float()))
-
-
-def adj_r2(target, pred, num_params):
-    return 1 - (1 - r2_metric(target, pred))*(len(target) - 1)/(len(target) - num_params - 1)
+    def rmse(self, normalized=False):
+        if normalized:
+            return np.sqrt(mean_squared_error(self.target, self.pred)) / np.mean(self.target)
+        return np.sqrt(mean_squared_error(self.target, self.pred))
     
+    def nrmse(self):
+        return self.rmse(normalized=True)
+    
+    def r2(self):
+        return r2_score(self.target, self.pred)
 
-def spearman_metric(target, pred):
-    import scipy
-
-    target = target.numpy() if torch.is_tensor(target) else target
-    pred = pred.numpy() if torch.is_tensor(pred) else pred
-    r = scipy.stats.spearmanr(target, pred)
-    return torch.tensor(r[0])
+    def adj_r2(self):
+        return 1 - (1 - self.r2()) * (self.n - 1) / (self.n - self.dim - 1)

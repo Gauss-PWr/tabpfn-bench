@@ -76,6 +76,8 @@ def get_model_params(
 
     X_train_subset, X_val, y_train_subset, y_val = train_test_split(
         X_train, y_train, test_size=0.2, random_state=42, stratify=y_train
+    ) if len(np.unique(y_train)) >= 2 else train_test_split(
+        X_train, y_train, test_size=0.2, random_state=42
     )
     if use_tensor:
         X_train_subset, y_train_subset = (
@@ -124,7 +126,7 @@ def get_model_params(
         objective,
         params,
         algo=tpe.suggest,
-        max_evals=100,
+        max_evals=None,
         trials=trials,
         timeout=max_time,
     )

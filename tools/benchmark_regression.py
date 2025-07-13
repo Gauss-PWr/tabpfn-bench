@@ -4,7 +4,7 @@ from catboost import CatBoostRegressor
 from hyperparameter_tuning import get_model_params
 from lightgbm import LGBMRegressor
 from tabpfn import TabPFNRegressor
-from tabular_metrics import get_regression_metrics
+from tabular_metrics import evaluate_regression
 from xgboost import XGBRegressor
 
 
@@ -60,7 +60,7 @@ def benchmark_dataset_regression(
         model_default = match_model(model)()
         model_default.fit(X_train, y_train)
 
-        metrics = get_regression_metrics(X_test, y_test, model_default)
+        metrics = evaluate_regression(X_test, y_test, model_default)
 
         results[model.__class__.__name__ + "_default"] = metrics
 

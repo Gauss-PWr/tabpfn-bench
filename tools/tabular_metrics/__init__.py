@@ -1,49 +1,37 @@
 from typing import Dict
 
-from .classification import *
-from .regression import *
-
-#xgboost
-#lightgbm
-#catboost
+from .classification import ClassificationBenchmark
+from .regression import RegressionBenchmark
 
 
-def get_classification_metrics(X, y, model) -> Dict[str, float]:
-    pred = model.predict(X)
-
+def evaluate_classification(X, y, model) -> Dict[str, float]:
+    bench = ClassificationBenchmark(X, y, model)
+    
     return {
-        'ACC': accuracy_metric(y, pred),
-        'BACC': balanced_accuracy_metric(y, pred),
-        'PREC': average_precision_metric(y, pred),
-        'REC': recall(y, pred),
-        'SPEC': specifity(y, pred),
-        'INFO': informedness(y, pred),
-        'MARK': markedness(y, pred),
-        'MATTHEWS': matthews(y, pred),
-        'F1': f1_metric(y, pred),
-        'CE': cross_entropy(y, pred),
-        'ROC_AUC': auc_metric_ovr(y, pred)
-
-
+        'accuracy': bench.accuracy(),
+        'precision': bench.precision(),
+        'recall': bench.recall(),
+        'F1': bench.F1(),
+        'roc_auc': bench.roc_auc(),
+        'informedness': bench.informedness(),
+        'markedness': bench.markedness(),
+        'matthews_corrcoef': bench.matthews(),
+        'model_name': bench.model_name,
+        'dim': bench.dim,
+        'n_samples': bench.n
     }
 
-
-def get_regression_metrics(X, y, model) -> Dict[str, float]:
-    pred = model.predict(X)
-    params = model.get_params()
-
-    if not hasattr(model, 'params'):
-        raise NotImplementedError('Model must have "params" atribute')
-
+def evaluate_regression(X, y, model) -> Dict[str, float]:
+    bench = RegressionBenchmark(X, y, model)
+    
     return {
-        'RMSE': root_mean_squared_error_metric(y, pred),
-        'NRMSE': normalized_root_mean_squared_error_metric(y, pred),
-        'MSE': mean_squared_error_metric(y, pred),
-        'NMSE': mean_squared_error_metric(y, pred),
-        'MAE': mean_absolute_error(y, pred),
-        'NMAE': normalized_mean_absolute_error_metric(y, pred),
-        'R_squared': r2_metric(y, pred),
-        'Adj_R_squared': adj_r2(y, pred, params),
-        'Spearman': spearman_metric(y, pred),
+        'mae': bench.mae(),
+        'nmae': bench.nmae(),
+        'rmse': bench.rmse(),
+        'nrmse': bench.nrmse(),
+        'r2': bench.r2(),
+        'adj_r2': bench.adj_r2(),
+        'model_name': bench.model_name,
+        'dim': bench.dim,
+        'n_samples': bench.n
     }
-

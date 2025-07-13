@@ -3,7 +3,7 @@ from catboost import CatBoostClassifier
 from hyperparameter_tuning import get_model_params
 from lightgbm import LGBMClassifier
 from tabpfn import TabPFNClassifier
-from tabular_metrics import get_classification_metrics
+from tabular_metrics import evaluate_classification
 from xgboost import XGBClassifier
 
 
@@ -60,7 +60,7 @@ def benchmark_dataset_classification(
         model_default.fit(X_train, y_train)
 
         y_pred = model_default.predict(X_test)
-        metrics = get_classification_metrics(X_test, y_test, model_default)
+        metrics = evaluate_classification(X_test, y_test, model_default)
 
         results[model.__class__.__name__ + "_default"] = metrics
 
