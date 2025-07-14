@@ -1,10 +1,11 @@
 import torch
 from catboost import CatBoostClassifier
-from hyperparameter_tuning import get_model_params
+from tools.hyperparameter_tuning import get_model_params
 from lightgbm import LGBMClassifier
 from tabpfn import TabPFNClassifier
-from tabular_metrics import evaluate_classification
+from tools.tabular_metrics import evaluate_classification
 from xgboost import XGBClassifier
+import pandas as pd
 
 
 def match_model(model):
@@ -33,6 +34,7 @@ def benchmark_dataset_classification(
         "TabPFNClassifier",
     ],
     csv_path=None,
+    tune_time=4 * 60 * 60,  # 4 hours
 ):
     if type(X_train) == pd.DataFrame:
         X_train = X_train.to_numpy()
@@ -69,14 +71,13 @@ def benchmark_dataset_classification(
             X_train,
             y_train,
             tune=True,
-            tune_metric="logloss",
-            max_time=4 * 60 * 60,  # 4h
+            max_time=tune_time,
             use_tensor=model == "TabPFNClassifier",
         )
         model_tuned = match_model(model)(**params)
 
         model_tuned.fit(X_train, y_train)
-        metrics = get_classification_metrics(X_test, y_test, model_tuned)
+        metrics = evaluate_classification(X_test, y_test, model_tuned)
 
         results[model.__class__.__name__ + "_tuned"] = metrics
 

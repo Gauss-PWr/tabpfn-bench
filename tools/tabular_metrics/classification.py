@@ -1,4 +1,3 @@
-from xml.parsers.expat import model
 import numpy as np
 
 from sklearn.metrics import (multilabel_confusion_matrix, 

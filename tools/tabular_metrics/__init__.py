@@ -16,9 +16,6 @@ def evaluate_classification(X, y, model) -> Dict[str, float]:
         'informedness': bench.informedness(),
         'markedness': bench.markedness(),
         'matthews_corrcoef': bench.matthews(),
-        'model_name': bench.model_name,
-        'dim': bench.dim,
-        'n_samples': bench.n
     }
 
 def evaluate_regression(X, y, model) -> Dict[str, float]:
@@ -31,7 +28,4 @@ def evaluate_regression(X, y, model) -> Dict[str, float]:
         'nrmse': bench.nrmse(),
         'r2': bench.r2(),
         'adj_r2': bench.adj_r2(),
-        'model_name': bench.model_name,
-        'dim': bench.dim,
-        'n_samples': bench.n
     }

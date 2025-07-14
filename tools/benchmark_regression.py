@@ -1,15 +1,16 @@
-import pandas as pd
+
 import torch
 from catboost import CatBoostRegressor
-from hyperparameter_tuning import get_model_params
+from tools.hyperparameter_tuning import get_model_params
 from lightgbm import LGBMRegressor
 from tabpfn import TabPFNRegressor
-from tabular_metrics import evaluate_regression
+from tools.tabular_metrics import evaluate_regression
 from xgboost import XGBRegressor
+import gc 
 
 
 def match_model(model):
-    match model.__class__.__name__:
+    match model:
         case "XGBRegressor":
             return XGBRegressor
         case "LGBMRegressor":
@@ -19,7 +20,7 @@ def match_model(model):
         case "TabPFNRegressor":
             return TabPFNRegressor
         case _:
-            raise ValueError(f"Model {model.__class__.__name__} not supported.")
+            raise ValueError(f"Model {model} not supported.")
 
 
 def benchmark_dataset_regression(
@@ -29,61 +30,90 @@ def benchmark_dataset_regression(
     y_test,
     models=[
         "XGBRegressor",
-        "LGBMRegressor",
+        "LGBMRegressor", 
         "CatBoostRegressor",
         "TabPFNRegressor",
     ],
     csv_path=None,
+    tune_time=4 * 60 * 60,  # 4 hours
 ):
-    if type(X_train) == pd.DataFrame:
+    import pandas as pd
+    
+    if isinstance(X_train, pd.DataFrame):
         X_train = X_train.to_numpy()
-    if type(X_test) == pd.DataFrame:
+    if isinstance(X_test, pd.DataFrame):
         X_test = X_test.to_numpy()
-    if type(y_train) == pd.Series:
+    if isinstance(y_train, pd.Series):
         y_train = y_train.to_numpy()
-    if type(y_test) == pd.Series:
+    if isinstance(y_test, pd.Series):
         y_test = y_test.to_numpy()
-
+    
+    X_train_orig = X_train.copy()
+    y_train_orig = y_train.copy()
+    X_test_orig = X_test.copy() 
+    y_test_orig = y_test.copy()
+    
     results = {}
-    for model in models:
-        if model == "TabPFNRegressor":
-            X_train = torch.Tensor(X_train)
-            X_test = torch.Tensor(X_test)
-            y_train = torch.Tensor(y_train)
-            y_test = torch.Tensor(y_test)
-            X_train, y_train, X_test, y_test = (
-                X_train.float(),
-                y_train.long(),
-                X_test.float(),
-                y_test.long(),
+    
+    for model_name in models:
+        print(f"Processing {model_name}...")
+        
+        X_train = X_train_orig.copy()
+        y_train = y_train_orig.copy()
+        X_test = X_test_orig.copy()
+        y_test = y_test_orig.copy()
+        
+        if model_name == "TabPFNRegressor":
+            X_train = torch.tensor(X_train, dtype=torch.float32)
+            X_test = torch.tensor(X_test, dtype=torch.float32)
+            y_train = torch.tensor(y_train, dtype=torch.float32)  # Use float32 for regression
+            y_test = torch.tensor(y_test, dtype=torch.float32)
+        
+        try:
+            model_default = match_model(model_name)()
+            model_default.fit(X_train, y_train)
+            metrics = evaluate_regression(X_test, y_test, model_default)
+            results[f"{model_name}_default"] = metrics
+            
+            del model_default
+            gc.collect()
+            
+            print(f"Tuning hyperparameters for {model_name}...")
+            unfitted_model = match_model(model_name)()
+            params = get_model_params(
+                unfitted_model,
+                X_train,
+                y_train,
+                tune=True,
+                max_time=tune_time,
+                use_tensor=model_name == "TabPFNRegressor",
             )
-        model_default = match_model(model)()
-        model_default.fit(X_train, y_train)
-
-        metrics = evaluate_regression(X_test, y_test, model_default)
-
-        results[model.__class__.__name__ + "_default"] = metrics
-
-        params = get_model_params(
-            model_default,
-            X_train,
-            y_train,
-            tune=True,
-            tune_metric="mse",
-            max_time=4 * 60 * 60,  # 4h
-            use_tensor=model == "TabPFNRegressor",
-        )
-        model_tuned = match_model(model)(**params)
-
-        model_tuned.fit(X_train, y_train)
-        metrics = get_regression_metrics(X_test, y_test, model_tuned)
-
-        results[model.__class__.__name__ + "_tuned"] = metrics
-
+            
+            del unfitted_model
+            gc.collect()
+            
+            # Tuned model
+            model_tuned = match_model(model_name)(**params)
+            model_tuned.fit(X_train, y_train)
+            metrics = evaluate_regression(X_test, y_test, model_tuned)
+            results[f"{model_name}_tuned"] = metrics
+            
+            del model_tuned
+            
+        except Exception as e:
+            print(f"Error processing {model_name}: {e}")
+            results[f"{model_name}_default"] = {"error": str(e)}
+            results[f"{model_name}_tuned"] = {"error": str(e)}
+        
+        if model_name == "TabPFNRegressor":
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        
+        gc.collect()
+        print(f"Completed {model_name}")
+    
     if csv_path:
-        import pandas as pd
-
         df = pd.DataFrame(results)
         df.to_csv(csv_path, index=False, mode='a')
-
+    
     return results

@@ -23,6 +23,7 @@ lgbm_params = {
     "min_child_weight": hp.choice(
         "min_child_weight", [1e-5, 1e-3, 1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4]
     ),
+    "verbose": -1,
     "subsample": hp.uniform("subsample", 0.2, 0.8),
     "colsample_bytree": hp.uniform("colsample_bytree", 0.2, 0.8),
     "reg_alpha": hp.choice("reg_alpha", [0, 1e-1, 1, 2, 5, 7, 10, 50, 100]),
@@ -40,12 +41,16 @@ tabpfn_params = {
     "n_estimators": hp.choice("n_estimators", [4, 8, 16, 32]),
     "softmax_temperature": hp.uniform("softmax_temperature", 0.75, 1.0),
     "average_before_softmax": hp.choice("average_before_softmax", [False, True]),
-    "fit_mode": hp.choice(
-        "fit_mode", ["low_memory", "fit_preprocessors", "fit_with_cache"]
-    ),
     "memory_saving_mode": hp.choice("memory_saving_mode", [True, False, "auto"]),
     "random_state": hp.randint("random_state", 0, 100),
     "n_jobs": hp.choice("n_jobs", [1, 4, -1]),
 }
 
 # w paperze jakies jeszcze gowno pisali trza zobaczyc
+
+int_params = [
+    "max_depth",
+    "n_estimators",
+    "num_leaves",
+    "leaf_estimation_iterations",
+]

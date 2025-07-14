@@ -5,14 +5,15 @@ from sklearn.model_selection import train_test_split
 from tools.benchmark_regression import benchmark_dataset_regression
 from tools.dataset import get_openml_ids_reg, load_dataset
 from tools.preprocess import preprocess_data
-
+import warnings
+warnings.filterwarnings("ignore")
 
 def main():
     csv_path = os.path.join("results", "regression_results.csv")
     print("Loading datasets...")
 
     ids = get_openml_ids_reg()
-    datasets = [load_dataset(id) for id in ids]
+    datasets = [load_dataset(id) for id in ids][:1]
     print(f"Loaded {len(datasets)} datasets for regression benchmarking.")
 
     results = []
@@ -22,7 +23,7 @@ def main():
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
         )
-        X_train, X_test, y_train, y_test = preprocess_data(
+        X_train, y_train, X_test, y_test = preprocess_data(
             X_train,
             y_train,
             X_test,
@@ -32,6 +33,7 @@ def main():
             standardize=True,
             categorical_features=categorical_indices,
         )
+        print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}")
 
         print(f"Benchmarking dataset {i + 1}/{len(datasets)}")
 
@@ -47,6 +49,7 @@ def main():
                 "TabPFNRegressor",
             ],
             csv_path=csv_path,
+            tune_time=12,  # 12 sec, TODO change to 4 hours set tune_time=4 * 60 * 60
         )
         results.append(result)
 
