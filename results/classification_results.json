@@ -1,0 +1,166 @@
+{
+  "41156": {
+    "XGBClassifier_default": {
+      "accuracy": 0.8734939759036144,
+      "precision": 0.8243127147766323,
+      "recall": 0.8231576822128003,
+      "f1": 0.8237325021894385,
+      "roc_auc": 0.912642842721583,
+      "informedness": 0.6463153644256006,
+      "markedness": 0.6486254295532645,
+      "matthews_corrcoef": 0.6474693667482887
+    },
+    "XGBClassifier_tuned": {
+      "accuracy": 0.8722891566265061,
+      "precision": 0.8259896453577251,
+      "recall": 0.8117100747022007,
+      "f1": 0.8184467061222132,
+      "roc_auc": 0.9232303654350899,
+      "informedness": 0.6234201494044014,
+      "markedness": 0.6519792907154502,
+      "matthews_corrcoef": 0.637539823718018
+    },
+    "LGBMClassifier_default": {
+      "accuracy": 0.8710843373493976,
+      "precision": 0.8220394736842105,
+      "recall": 0.8162527760952958,
+      "f1": 0.8190781767252355,
+      "roc_auc": 0.9185382596406219,
+      "informedness": 0.6325055521905916,
+      "markedness": 0.644078947368421,
+      "matthews_corrcoef": 0.638266018412071
+    },
+    "LGBMClassifier_tuned": {
+      "accuracy": 0.8698795180722891,
+      "precision": 0.8238893322692206,
+      "recall": 0.8048051685846962,
+      "f1": 0.8136243045217522,
+      "roc_auc": 0.9275105996365838,
+      "informedness": 0.6096103371693924,
+      "markedness": 0.6477786645384411,
+      "matthews_corrcoef": 0.6284047820477003
+    },
+    "CatBoostClassifier_default": {
+      "accuracy": 0.8674698795180723,
+      "precision": 0.8189795694293123,
+      "recall": 0.8050070664243892,
+      "f1": 0.8115956384287117,
+      "roc_auc": 0.9227538865334141,
+      "informedness": 0.6100141328487785,
+      "markedness": 0.6379591388586245,
+      "matthews_corrcoef": 0.6238301779200789
+    },
+    "CatBoostClassifier_tuned": {
+      "accuracy": 0.863855421686747,
+      "precision": 0.8312004325883201,
+      "recall": 0.7671108419139916,
+      "f1": 0.7914753690145604,
+      "roc_auc": 0.9275105996365839,
+      "informedness": 0.5342216838279832,
+      "markedness": 0.6624008651766402,
+      "matthews_corrcoef": 0.5948688137428096
+    },
+    "TabPFNClassifier_default": {
+      "accuracy": 0.8674698795180723,
+      "precision": 0.8281759184469264,
+      "recall": 0.7854633555420957,
+      "f1": 0.8033277038670987,
+      "roc_auc": 0.930409852614577,
+      "informedness": 0.5709267110841914,
+      "markedness": 0.6563518368938528,
+      "matthews_corrcoef": 0.6121509581401265
+    },
+    "TabPFNClassifier_tuned": {
+      "accuracy": 0.8626506024096385,
+      "precision": 0.820469970011791,
+      "recall": 0.7787603472642843,
+      "f1": 0.7961759840077204,
+      "roc_auc": 0.9301837270341208,
+      "informedness": 0.5575206945285687,
+      "markedness": 0.640939940023582,
+      "matthews_corrcoef": 0.597776948796996
+    }
+  },
+  "40981": {
+    "XGBClassifier_default": {
+      "accuracy": 0.8623188405797102,
+      "precision": 0.8555555555555556,
+      "recall": 0.8461798512508452,
+      "f1": 0.8503680876562232,
+      "roc_auc": 0.8918187964841109,
+      "informedness": 0.6923597025016903,
+      "markedness": 0.7111111111111112,
+      "matthews_corrcoef": 0.7016727708373294
+    },
+    "XGBClassifier_tuned": {
+      "accuracy": 0.8840579710144928,
+      "precision": 0.8755916159567275,
+      "recall": 0.8755916159567275,
+      "f1": 0.8755916159567275,
+      "roc_auc": 0.9116520171286906,
+      "informedness": 0.751183231913455,
+      "markedness": 0.751183231913455,
+      "matthews_corrcoef": 0.751183231913455
+    },
+    "LGBMClassifier_default": {
+      "accuracy": 0.8478260869565217,
+      "precision": 0.8375,
+      "recall": 0.834685598377282,
+      "f1": 0.8360396039603961,
+      "roc_auc": 0.9006085192697769,
+      "informedness": 0.6693711967545639,
+      "markedness": 0.675,
+      "matthews_corrcoef": 0.6721797064843081
+    },
+    "LGBMClassifier_tuned": {
+      "accuracy": 0.8478260869565217,
+      "precision": 0.8375,
+      "recall": 0.834685598377282,
+      "f1": 0.8360396039603961,
+      "roc_auc": 0.8970024791525806,
+      "informedness": 0.6693711967545639,
+      "markedness": 0.675,
+      "matthews_corrcoef": 0.6721797064843081
+    },
+    "CatBoostClassifier_default": {
+      "accuracy": 0.855072463768116,
+      "precision": 0.8444895199459095,
+      "recall": 0.8444895199459095,
+      "f1": 0.8444895199459095,
+      "roc_auc": 0.8911426639621367,
+      "informedness": 0.688979039891819,
+      "markedness": 0.688979039891819,
+      "matthews_corrcoef": 0.6889790398918187
+    },
+    "CatBoostClassifier_tuned": {
+      "accuracy": 0.8768115942028986,
+      "precision": 0.8652003484320558,
+      "recall": 0.8779580797836376,
+      "f1": 0.8702648896753857,
+      "roc_auc": 0.9195402298850575,
+      "informedness": 0.7559161595672752,
+      "markedness": 0.7304006968641117,
+      "matthews_corrcoef": 0.7430489147551329
+    },
+    "TabPFNClassifier_default": {
+      "accuracy": 0.8405797101449275,
+      "precision": 0.828577558463849,
+      "recall": 0.8451656524678837,
+      "f1": 0.8337349397590361,
+      "roc_auc": 0.9179625873337841,
+      "informedness": 0.6903313049357673,
+      "markedness": 0.6571551169276979,
+      "matthews_corrcoef": 0.673538973938342
+    },
+    "TabPFNClassifier_tuned": {
+      "accuracy": 0.8478260869565217,
+      "precision": 0.8355603448275861,
+      "recall": 0.8509127789046653,
+      "f1": 0.8407954732736362,
+      "roc_auc": 0.9195402298850573,
+      "informedness": 0.7018255578093306,
+      "markedness": 0.6711206896551722,
+      "matthews_corrcoef": 0.6863014296754918
+    }
+  }
+}

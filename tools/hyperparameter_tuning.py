@@ -8,9 +8,15 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 from tabpfn import TabPFNClassifier, TabPFNRegressor
 from xgboost import XGBClassifier, XGBRegressor
 
-from tools.constants import (catboost_params, lgbm_params, tabpfn_params,
-                             xgb_params, int_params)
+from tools.constants import (
+    catboost_params,
+    lgbm_params,
+    tabpfn_params,
+    xgb_params,
+    int_params,
+)
 from sklearn.metrics import mean_squared_error, log_loss
+
 
 def match_model_params(model_class_name):
     match model_class_name:
@@ -34,6 +40,7 @@ def match_model_params(model_class_name):
             raise ValueError(f"Model {model_class_name} not supported.")
     return params
 
+
 def create_model_instance(model_class_name, params):
     match model_class_name:
         case "XGBClassifier":
@@ -55,6 +62,7 @@ def create_model_instance(model_class_name, params):
         case _:
             raise ValueError(f"Model {model_class_name} not supported.")
 
+
 def get_model_params(
     model,
     X_train,
@@ -63,7 +71,9 @@ def get_model_params(
     max_time=60,
     use_tensor=False,
 ):
-    assert torch.cuda.is_available(), "CUDA is not available. Please check your PyTorch installation."
+    assert (
+        torch.cuda.is_available()
+    ), "CUDA is not available. Please check your PyTorch installation."
 
     model_class_name = model.__class__.__name__
     is_classifier = "Classifier" in model_class_name
@@ -89,13 +99,16 @@ def get_model_params(
     if not tune:
         return {}
     params = match_model_params(model_class_name)
-    
+
     unique_values, counts = np.unique(y_train, return_counts=True)
     can_stratify = len(unique_values) >= 2 and np.min(counts) >= 2
 
     X_train_subset, X_val, y_train_subset, y_val = train_test_split(
-        X_train, y_train, test_size=0.2, random_state=42, 
-        stratify=y_train if can_stratify else None
+        X_train,
+        y_train,
+        test_size=0.2,
+        random_state=42,
+        stratify=y_train if can_stratify else None,
     )
     if use_tensor:
         X_train_subset, y_train_subset = (
@@ -115,19 +128,21 @@ def get_model_params(
         for param in int_params:
             if param in params:
                 params[param] = int(params[param])
-        
+
         model_instance = create_model_instance(model_class_name, params)
-        
+
         model_instance.fit(X_train_subset, y_train_subset)
-        
+
         if hasattr(model_instance, "predict_proba"):
             y_pred = model_instance.predict_proba(X_val)
             if y_pred.shape[1] == 2:
                 y_pred = y_pred[:, 1]
         else:
             y_pred = model_instance.predict(X_val)
-        
-        metric_func = (log_loss if "Classifier" in model_class_name else mean_squared_error)
+
+        metric_func = (
+            log_loss if "Classifier" in model_class_name else mean_squared_error
+        )
         score = metric_func(y_val, y_pred)
         return {"loss": score, "status": STATUS_OK}
 
@@ -136,7 +151,8 @@ def get_model_params(
         objective,
         params,
         algo=tpe.suggest,
-        max_evals=None,
+        max_evals=1_000_000,
+        verbose=0,
         trials=trials,
         timeout=max_time,
     )
@@ -144,6 +160,6 @@ def get_model_params(
     for param in int_params:
         if param in best_params:
             best_params[param] = int(best_params[param])
-    print("Best parameters:", best_params)
+    print("Best parameters found")
 
     return best_params

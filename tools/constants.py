@@ -40,7 +40,8 @@ catboost_params = {
     "iterations": hp.quniform("iterations", 100, 4000, 1),
 }
 tabpfn_params = {
-    'device': 'cuda',
+    "device": "cuda",
+    "ignore_pretraining_limits": True,
     "n_estimators": hp.choice("n_estimators", [4, 8, 16, 32]),
     "softmax_temperature": hp.uniform("softmax_temperature", 0.75, 1.0),
     "average_before_softmax": hp.choice("average_before_softmax", [False, True]),
@@ -49,7 +50,7 @@ tabpfn_params = {
     "n_jobs": hp.choice("n_jobs", [1, 4, -1]),
 }
 
-# w paperze jakies jeszcze gowno pisali trza zobaczyc
+# TODO w paperze jakies jeszcze gowno pisali trza zobaczyc
 
 int_params = [
     "max_depth",

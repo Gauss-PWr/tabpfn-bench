@@ -7,17 +7,21 @@ from tools.benchmark_regression import benchmark_dataset_regression
 from tools.dataset import get_openml_ids_reg, load_dataset
 from tools.preprocess import preprocess_data
 import warnings
+
 warnings.filterwarnings("ignore")
 
-def main():
-    assert torch.cuda.is_available(), "CUDA is not available. Please check your PyTorch installation."
+
+def main_reg():
+    assert (
+        torch.cuda.is_available()
+    ), "CUDA is not available. Please check your PyTorch installation."
     print("CUDA is available. Proceeding with benchmarking...")
 
     json_path = os.path.join("results", "regression_results.json")
     print("Loading datasets...")
 
     ids = get_openml_ids_reg()
-    datasets = [load_dataset(id) for id in ids][:1]
+    datasets = [load_dataset(id) for id in ids][:2] # TODO: change to all datasets
     print(f"Loaded {len(datasets)} datasets for regression benchmarking.")
 
     results = []
@@ -53,17 +57,12 @@ def main():
                 "TabPFNRegressor",
             ],
             json_path=json_path,
-            tune_time=120,  # 2 min, TODO change to 4 hours set tune_time=4 * 60 * 60
+            tune_time=120,  # 120 seconds, TODO change to 4 hours set tune_time=4 * 60 * 60
             dataset_id=ids[i],
         )
         results.append(result)
 
-    print("Benchmarking completed.")
-
-    # Print results
-    for i, result in enumerate(results):
-        print(f"Results for dataset {i + 1}: {result}")
-
+    print("Regression benchmarking completed.")
 
 if __name__ == "__main__":
-    main()
+    main_reg()
