@@ -2,9 +2,15 @@ from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 import numpy as np
 
 class RegressionBenchmark:
-    def __init__(self, X, y, model):
+    def __init__(self, X, y, model, use_tensor=False):
+        if use_tensor:
+            import torch
+            assert torch.cuda.is_available(), "CUDA is not available. Ensure you have a compatible GPU and PyTorch installed with CUDA support."
+            X = torch.tensor(X, dtype=torch.float32)
+            y = torch.tensor(y, dtype=torch.float32)
+
         self.target = np.array(y) if not isinstance(y, np.ndarray) else y
-        self.pred = np.array(model.predict(X)) if not isinstance(model.predict(X), np.ndarray) else model.predict(X)
+        self.pred = model.predict(X).cpu().numpy() if not isinstance(model.predict(X), np.ndarray) else model.predict(X)
 
         self.dim = X.shape[1] if hasattr(X, 'shape') else 1
         self.n = X.shape[0] if hasattr(X, 'shape') else len(X)

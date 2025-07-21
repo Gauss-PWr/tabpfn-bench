@@ -62,11 +62,12 @@ def get_model_params(
     tune=False,
     max_time=60,
     use_tensor=False,
-    device='cuda' if torch.cuda.is_available() else None,
 ):
+    assert torch.cuda.is_available(), "CUDA is not available. Please check your PyTorch installation."
+
     model_class_name = model.__class__.__name__
-    
     is_classifier = "Classifier" in model_class_name
+
     if type(X_train) == torch.Tensor:
         X_train = X_train.cpu().numpy()
 
@@ -109,12 +110,6 @@ def get_model_params(
         if is_classifier:
             y_train_subset = y_train_subset.int()
             y_val = y_val.int()
-
-        if device is not None:
-            X_train_subset = X_train_subset.to(device)
-            y_train_subset = y_train_subset.to(device)
-            X_val = X_val.to(device)
-            y_val = y_val.to(device)
 
     def objective(params):
         for param in int_params:

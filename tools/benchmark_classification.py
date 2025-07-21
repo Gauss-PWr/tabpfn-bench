@@ -61,7 +61,6 @@ def benchmark_dataset_classification(
         model_default = match_model(model)()
         model_default.fit(X_train, y_train)
 
-        y_pred = model_default.predict(X_test)
         metrics = evaluate_classification(X_test, y_test, model_default)
 
         results[model.__class__.__name__ + "_default"] = metrics

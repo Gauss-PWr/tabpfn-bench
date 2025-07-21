@@ -1,6 +1,7 @@
 import os
 
 from sklearn.model_selection import train_test_split
+import torch
 
 from tools.benchmark_regression import benchmark_dataset_regression
 from tools.dataset import get_openml_ids_reg, load_dataset
@@ -9,7 +10,10 @@ import warnings
 warnings.filterwarnings("ignore")
 
 def main():
-    csv_path = os.path.join("results", "regression_results.csv")
+    assert torch.cuda.is_available(), "CUDA is not available. Please check your PyTorch installation."
+    print("CUDA is available. Proceeding with benchmarking...")
+
+    json_path = os.path.join("results", "regression_results.json")
     print("Loading datasets...")
 
     ids = get_openml_ids_reg()
@@ -48,8 +52,9 @@ def main():
                 "CatBoostRegressor",
                 "TabPFNRegressor",
             ],
-            csv_path=csv_path,
-            tune_time=12,  # 12 sec, TODO change to 4 hours set tune_time=4 * 60 * 60
+            json_path=json_path,
+            tune_time=120,  # 2 min, TODO change to 4 hours set tune_time=4 * 60 * 60
+            dataset_id=ids[i],
         )
         results.append(result)
 

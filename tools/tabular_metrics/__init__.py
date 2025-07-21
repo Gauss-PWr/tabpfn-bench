@@ -4,28 +4,28 @@ from .classification import ClassificationBenchmark
 from .regression import RegressionBenchmark
 
 
-def evaluate_classification(X, y, model) -> Dict[str, float]:
-    bench = ClassificationBenchmark(X, y, model)
-    
+def evaluate_classification(X, y, model, use_tensor=False) -> Dict[str, float]:
+    bench = ClassificationBenchmark(X, y, model, use_tensor=use_tensor)
+
     return {
-        'accuracy': bench.accuracy(),
-        'precision': bench.precision(),
-        'recall': bench.recall(),
-        'F1': bench.F1(),
-        'roc_auc': bench.roc_auc(),
-        'informedness': bench.informedness(),
-        'markedness': bench.markedness(),
-        'matthews_corrcoef': bench.matthews(),
+        'accuracy': float(bench.accuracy()),
+        'precision': float(bench.precision()),
+        'recall': float(bench.recall()),
+        'F1': float(bench.F1()),
+        'roc_auc': float(bench.roc_auc()),
+        'informedness': float(bench.informedness()),
+        'markedness': float(bench.markedness()),
+        'matthews_corrcoef': float(bench.matthews()),
     }
 
-def evaluate_regression(X, y, model) -> Dict[str, float]:
-    bench = RegressionBenchmark(X, y, model)
-    
+def evaluate_regression(X, y, model, use_tensor=False) -> Dict[str, float]:
+    bench = RegressionBenchmark(X, y, model, use_tensor=use_tensor)
+
     return {
-        'mae': bench.mae(),
-        'nmae': bench.nmae(),
-        'rmse': bench.rmse(),
-        'nrmse': bench.nrmse(),
-        'r2': bench.r2(),
-        'adj_r2': bench.adj_r2(),
+        'mae': float(bench.mae()),
+        'nmae': float(bench.nmae()),
+        'rmse': float(bench.rmse()),
+        'nrmse': float(bench.nrmse()),
+        'r2': float(bench.r2()),
+        'adj_r2': float(bench.adj_r2()),
     }

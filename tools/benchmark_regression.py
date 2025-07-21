@@ -1,3 +1,5 @@
+import os
+import json
 
 import torch
 from catboost import CatBoostRegressor
@@ -34,9 +36,14 @@ def benchmark_dataset_regression(
         "CatBoostRegressor",
         "TabPFNRegressor",
     ],
-    csv_path=None,
+    json_path=None,
     tune_time=4 * 60 * 60,  # 4 hours
+    dataset_id=None,
 ):
+    assert dataset_id is not None, "dataset_id must be provided"
+    
+    if json_path:
+        assert json_path.endswith('.json'), "json_path must end with .json"
     import pandas as pd
     
     if isinstance(X_train, pd.DataFrame):
@@ -64,15 +71,15 @@ def benchmark_dataset_regression(
         y_test = y_test_orig.copy()
         
         if model_name == "TabPFNRegressor":
+            assert torch.cuda.is_available(), "CUDA is not available. Please check your PyTorch installation."
             X_train = torch.tensor(X_train, dtype=torch.float32)
             X_test = torch.tensor(X_test, dtype=torch.float32)
-            y_train = torch.tensor(y_train, dtype=torch.float32)  # Use float32 for regression
+            y_train = torch.tensor(y_train, dtype=torch.float32)
             y_test = torch.tensor(y_test, dtype=torch.float32)
-        
         try:
             model_default = match_model(model_name)()
             model_default.fit(X_train, y_train)
-            metrics = evaluate_regression(X_test, y_test, model_default)
+            metrics = evaluate_regression(X_test, y_test, model_default, use_tensor=model_name == "TabPFNRegressor")
             results[f"{model_name}_default"] = metrics
             
             del model_default
@@ -95,7 +102,7 @@ def benchmark_dataset_regression(
             # Tuned model
             model_tuned = match_model(model_name)(**params)
             model_tuned.fit(X_train, y_train)
-            metrics = evaluate_regression(X_test, y_test, model_tuned)
+            metrics = evaluate_regression(X_test, y_test, model_tuned, use_tensor=model_name == "TabPFNRegressor")
             results[f"{model_name}_tuned"] = metrics
             
             del model_tuned
@@ -112,8 +119,25 @@ def benchmark_dataset_regression(
         gc.collect()
         print(f"Completed {model_name}")
     
-    if csv_path:
-        df = pd.DataFrame(results)
-        df.to_csv(csv_path, index=False, mode='a')
+    if json_path:
+        result_record = {dataset_id: results}
+
+        file_exists = os.path.exists(json_path) and os.path.getsize(json_path) > 0
+        
+        if file_exists:
+            try:
+                with open(json_path, 'r') as f:
+                    existing_data = json.load(f)
+                if not isinstance(existing_data, list):
+                    existing_data = [existing_data]
+            except (json.JSONDecodeError, FileNotFoundError):
+                existing_data = []
+        else:
+            existing_data = []
+        
+        existing_data.append(result_record)
+        
+        with open(json_path, 'w') as f:
+            json.dump(existing_data, f, indent=2)
     
     return results

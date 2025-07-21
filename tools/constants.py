@@ -2,6 +2,7 @@ import numpy as np
 from hyperopt import hp
 
 xgb_params = {
+    "verbose": 0,
     "learning_rate": hp.loguniform("learning_rate", np.log(1e-7), np.log(1)),
     "max_depth": hp.quniform("max_depth", 1, 10, 1),
     "subsample": hp.uniform("subsample", 0.2, 1.0),
@@ -30,6 +31,7 @@ lgbm_params = {
     "reg_lambda": hp.choice("reg_lambda", [0, 1e-1, 1, 5, 10, 20, 50, 100]),
 }
 catboost_params = {
+    "verbose": 0,
     "learning_rate": hp.loguniform("learning_rate", np.log(1e-5), np.log(1)),
     "random_strength": hp.quniform("random_strength", 1, 20, 1),
     "l2_leaf_reg": hp.loguniform("l2_leaf_reg", np.log(1), np.log(10)),
@@ -38,6 +40,7 @@ catboost_params = {
     "iterations": hp.quniform("iterations", 100, 4000, 1),
 }
 tabpfn_params = {
+    'device': 'cuda',
     "n_estimators": hp.choice("n_estimators", [4, 8, 16, 32]),
     "softmax_temperature": hp.uniform("softmax_temperature", 0.75, 1.0),
     "average_before_softmax": hp.choice("average_before_softmax", [False, True]),
